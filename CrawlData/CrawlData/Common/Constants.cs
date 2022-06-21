@@ -9,5 +9,6 @@ namespace CrawlData.Common
     public static class Constants
     {
         public const string BHDSTAR = "BHDSTAR";
+        public const string CGV = "CGV";
     }
 }

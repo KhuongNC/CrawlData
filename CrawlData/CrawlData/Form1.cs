@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using CrawlData.Model;
 using HtmlAgilityPack;
 using Fizzler.Systems.HtmlAgilityPack;
 using CrawlData.Common;
+using OpenQA.Selenium.Chrome;
 
 namespace CrawlData
 {
@@ -38,7 +35,6 @@ namespace CrawlData
             string website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
             string url = CbbWebsite.SelectedItem.ToString();
             List<Movie> movieList = CrawlData(url, website);
-            MessageBox.Show("Export successfully");
         }
 
         private List<Movie> CrawlData(string url, string website)
@@ -76,6 +72,19 @@ namespace CrawlData
                             }
                         }
 
+                        break;
+                    case Constants.CGV:
+                        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+
+                        // Because the error "please enable javascript to view the page content agility".
+                        // So use ChromeDriver and Selenium to get html page of CGV website
+                        using (var driver = new ChromeDriver())
+                        {
+                            driver.Navigate().GoToUrl(url);
+                            doc.LoadHtml(driver.PageSource);
+                        }
+
+                        nodeList = doc.DocumentNode.QuerySelectorAll("").ToList();
                         break;
                     default:
                         break;

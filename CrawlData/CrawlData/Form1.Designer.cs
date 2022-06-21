@@ -51,8 +51,7 @@
             this.CbbFormatter.Location = new System.Drawing.Point(117, 88);
             this.CbbFormatter.Name = "CbbFormatter";
             this.CbbFormatter.Size = new System.Drawing.Size(176, 21);
-            this.CbbFormatter.TabIndex = 3;
-            this.CbbFormatter.TabStop = false;
+            this.CbbFormatter.TabIndex = 1;
             // 
             // CbbWebsite
             // 
@@ -60,8 +59,7 @@
             this.CbbWebsite.Location = new System.Drawing.Point(117, 36);
             this.CbbWebsite.Name = "CbbWebsite";
             this.CbbWebsite.Size = new System.Drawing.Size(176, 21);
-            this.CbbWebsite.TabIndex = 4;
-            this.CbbWebsite.TabStop = false;
+            this.CbbWebsite.TabIndex = 0;
             // 
             // label1
             // 

@@ -8,6 +8,8 @@ using HtmlAgilityPack;
 using Fizzler.Systems.HtmlAgilityPack;
 using CrawlData.Common;
 using OpenQA.Selenium.Chrome;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace CrawlData
 {
@@ -32,11 +34,24 @@ namespace CrawlData
 
         private void BtnExport_Click(object sender, EventArgs e)
         {
-            string website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
-            string url = CbbWebsite.SelectedItem.ToString();
-            List<Movie> movieList = CrawlData(url, website);
+            if (CbbFormatter.SelectedItem != null && CbbWebsite.SelectedItem != null)
+            {
+                string website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
+                string url = CbbWebsite.SelectedItem.ToString();
+                string extension = CbbFormatter.SelectedItem.ToString();
+
+                Cursor = Cursors.WaitCursor;
+                List<Movie> movieList = CrawlData(url, website);
+                Export(movieList, website, extension);
+                Cursor = Cursors.Arrow;
+            }
+            else
+            {
+                MessageBox.Show("Website and Formatter cannot be blank. Please enter!");
+            }
         }
 
+        #region Crawl data
         private List<Movie> CrawlData(string url, string website)
         {
             List<Movie> movieList = new List<Movie>();
@@ -198,5 +213,33 @@ namespace CrawlData
 
             return movie;
         }
+
+        #endregion
+
+        #region Export data
+        private void Export(List<Movie> list, string website, string extension)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(list);
+                string logFolder = AppDomain.CurrentDomain.BaseDirectory;
+                string f = Directory.GetCurrentDirectory();
+                var currentDate = DateTime.Now.ToString("yyyyMMdd");
+
+                if (!Directory.Exists(logFolder + "\\" + currentDate))
+                {
+                    Directory.CreateDirectory(logFolder + "\\" + currentDate);
+                }
+
+                File.WriteAllText(logFolder + "\\" + currentDate + "\\" + website + extension, json.ToString());
+
+                MessageBox.Show("Export successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        #endregion
     }
 }

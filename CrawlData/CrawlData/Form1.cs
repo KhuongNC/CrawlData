@@ -217,7 +217,7 @@ namespace CrawlData
         #endregion
 
         #region Export data
-        private void Export(List<Movie> list, string website, string extension)
+        private void Export<T>(List<T> list, string website, string extension)
         {
             try
             {

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CrawlData.Common
+﻿namespace CrawlData.Common
 {
     public static class Constants
     {
         public const string BHDSTAR = "BHDSTAR";
         public const string CGV = "CGV";
+        public const string KENH14 = "KENH14";
     }
 
     public static class ExtensionOfFile
@@ -23,5 +18,6 @@ namespace CrawlData.Common
     public static class FieldType
     {
         public const string MOVIE = "Movie";
+        public const string NEWS = "News";
     }
 }

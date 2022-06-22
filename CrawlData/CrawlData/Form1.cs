@@ -12,11 +12,16 @@ using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
 using System.IO;
 using CrawlData.Utilities;
+using iTextSharp.text;
+using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Support.UI;
 
 namespace CrawlData
 {
     public partial class Form1 : Form
     {
+        readonly string rootPath = new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
+        string currentDate = DateTime.Now.ToString("yyyyMMdd");
         public Form1()
         {
             InitializeComponent();
@@ -54,7 +59,7 @@ namespace CrawlData
                         ExportToCsvFile(movieList, website, extension);
                         break;
                     case ExtensionOfFile.PDF:
-                        ExportToTextFile(movieList, website, extension);
+                        ExportToPdfFile(movieList, website, extension);
                         break;
                     case ExtensionOfFile.XLSX:
                         ExportToTextFile(movieList, website, extension);
@@ -63,7 +68,6 @@ namespace CrawlData
                         MessageBox.Show("Please select extension of file");
                         break;
                 }
-
 
                 Cursor = Cursors.Arrow;
             }
@@ -118,8 +122,8 @@ namespace CrawlData
                         using (var driver = new ChromeDriver())
                         {
                             driver.Navigate().GoToUrl(url);
-                            //driver.SwitchTo().ParentFrame();
                             doc.LoadHtml(driver.PageSource);
+                            driver.SwitchTo().ParentFrame();
                         }
 
                         nodeList = doc.DocumentNode.QuerySelectorAll("div.slideshow-containe-movier ul div > li").ToList();
@@ -179,8 +183,8 @@ namespace CrawlData
                     using (var driver = new ChromeDriver())
                     {
                         driver.Navigate().GoToUrl(url);
-                        //driver.SwitchTo().ParentFrame();
                         doc.LoadHtml(driver.PageSource);
+                        driver.SwitchTo().ParentFrame();
                     }
 
                     // Get information about movie
@@ -245,22 +249,24 @@ namespace CrawlData
         {
             try
             {
+                // Pretty Json string
                 var json = JsonConvert.SerializeObject(list);
-                string logFolder = AppDomain.CurrentDomain.BaseDirectory;
-                var currentDate = DateTime.Now.ToString("yyyyMMdd");
+                string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
 
-                if (!Directory.Exists(logFolder + "\\" + currentDate))
+                string pathToSave = rootPath + "\\" + currentDate;
+
+                if (!Directory.Exists(pathToSave))
                 {
-                    Directory.CreateDirectory(logFolder + "\\" + currentDate);
+                    Directory.CreateDirectory(pathToSave);
                 }
 
-                File.WriteAllText(logFolder + "\\" + currentDate + "\\" + website + extension, json.ToString());
+                File.WriteAllText(pathToSave + "\\" + website + extension, jsonFormatted);
 
-                MessageBox.Show("Export successfully");
+                MessageBox.Show("Export successfully", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -268,15 +274,14 @@ namespace CrawlData
         {
             try
             {
-                string logFolder = AppDomain.CurrentDomain.BaseDirectory;
-                var currentDate = DateTime.Now.ToString("yyyyMMdd");
+                string pathToSave = rootPath + "\\" + currentDate;
 
-                if (!Directory.Exists(logFolder + "\\" + currentDate))
+                if (!Directory.Exists(pathToSave))
                 {
-                    Directory.CreateDirectory(logFolder + "\\" + currentDate);
+                    Directory.CreateDirectory(pathToSave);
                 }
 
-                using (CsvFileWriter writer = new CsvFileWriter(logFolder + "\\" + currentDate + "\\" + website + extension))
+                using (CsvFileWriter writer = new CsvFileWriter(pathToSave + "\\" + website + extension))
                 {
                     CsvRow header = new CsvRow
                     {
@@ -326,12 +331,45 @@ namespace CrawlData
 
                 }
 
-
-                MessageBox.Show("Export successfully");
+                MessageBox.Show("Export successfully", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExportToPdfFile<T>(List<T> list, string website, string extension)
+        {
+            try
+            {
+                string pathToSave = rootPath + "\\" + currentDate;
+
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+
+                // Pretty Json string
+                var json = JsonConvert.SerializeObject(list);
+                string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
+
+                string fileName = Path.Combine(pathToSave, website + extension);
+                var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                var document = new Document(PageSize.A4);
+                var writer = iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
+                document.Open();
+                document.NewPage();
+                Paragraph content = new Paragraph(jsonFormatted);
+                document.Add(content);
+                document.Close();
+                fs.Close();
+
+                MessageBox.Show("Export successfully", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion

@@ -8,8 +8,10 @@ using HtmlAgilityPack;
 using Fizzler.Systems.HtmlAgilityPack;
 using CrawlData.Common;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
 using System.IO;
+using CrawlData.Utilities;
 
 namespace CrawlData
 {
@@ -42,7 +44,27 @@ namespace CrawlData
 
                 Cursor = Cursors.WaitCursor;
                 List<Movie> movieList = CrawlData(url, website);
-                Export(movieList, website, extension);
+
+                switch (extension)
+                {
+                    case ExtensionOfFile.TXT:
+                        ExportToTextFile(movieList, website, extension);
+                        break;
+                    case ExtensionOfFile.CSV:
+                        ExportToCsvFile(movieList, website, extension);
+                        break;
+                    case ExtensionOfFile.PDF:
+                        ExportToTextFile(movieList, website, extension);
+                        break;
+                    case ExtensionOfFile.XLSX:
+                        ExportToTextFile(movieList, website, extension);
+                        break;
+                    default:
+                        MessageBox.Show("Please select extension of file");
+                        break;
+                }
+
+
                 Cursor = Cursors.Arrow;
             }
             else
@@ -96,6 +118,7 @@ namespace CrawlData
                         using (var driver = new ChromeDriver())
                         {
                             driver.Navigate().GoToUrl(url);
+                            //driver.SwitchTo().ParentFrame();
                             doc.LoadHtml(driver.PageSource);
                         }
 
@@ -156,6 +179,7 @@ namespace CrawlData
                     using (var driver = new ChromeDriver())
                     {
                         driver.Navigate().GoToUrl(url);
+                        //driver.SwitchTo().ParentFrame();
                         doc.LoadHtml(driver.PageSource);
                     }
 
@@ -217,13 +241,12 @@ namespace CrawlData
         #endregion
 
         #region Export data
-        private void Export<T>(List<T> list, string website, string extension)
+        private void ExportToTextFile<T>(List<T> list, string website, string extension)
         {
             try
             {
                 var json = JsonConvert.SerializeObject(list);
                 string logFolder = AppDomain.CurrentDomain.BaseDirectory;
-                string f = Directory.GetCurrentDirectory();
                 var currentDate = DateTime.Now.ToString("yyyyMMdd");
 
                 if (!Directory.Exists(logFolder + "\\" + currentDate))
@@ -232,6 +255,77 @@ namespace CrawlData
                 }
 
                 File.WriteAllText(logFolder + "\\" + currentDate + "\\" + website + extension, json.ToString());
+
+                MessageBox.Show("Export successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void ExportToCsvFile<T>(List<T> list, string website, string extension)
+        {
+            try
+            {
+                string logFolder = AppDomain.CurrentDomain.BaseDirectory;
+                var currentDate = DateTime.Now.ToString("yyyyMMdd");
+
+                if (!Directory.Exists(logFolder + "\\" + currentDate))
+                {
+                    Directory.CreateDirectory(logFolder + "\\" + currentDate);
+                }
+
+                using (CsvFileWriter writer = new CsvFileWriter(logFolder + "\\" + currentDate + "\\" + website + extension))
+                {
+                    CsvRow header = new CsvRow
+                    {
+                        string.Format("{0}","Name"),
+                        string.Format("{0}","Director"),
+                        string.Format("{0}","Actors"),
+                        string.Format("{0}","TypeOfMovie"),
+                        string.Format("{0}","PremiereDate"),
+                        string.Format("{0}","Duration"),
+                        string.Format("{0}","Language"),
+                        string.Format("{0}","Rated"),
+                        string.Format("{0}","Content"),
+                        string.Format("{0}","ImageLink"),
+                        string.Format("{0}","TrailerLink")
+                    };
+
+                    writer.WriteRow(header);
+
+                    switch (typeof(T).Name)
+                    {
+                        case FieldType.MOVIE:
+                            foreach (var item in list)
+                            {
+                                var x = (Movie)Convert.ChangeType(item, typeof(Movie));
+
+                                CsvRow row = new CsvRow
+                                {
+                                    string.Format("{0}",x.Name),
+                                    string.Format("{0}",x.Director),
+                                    string.Format("{0}",x.Actors),
+                                    string.Format("{0}",x.TypeOfMovie),
+                                    string.Format("{0}",x.PremiereDate),
+                                    string.Format("{0}",x.Duration),
+                                    string.Format("{0}",x.Language),
+                                    string.Format("{0}",x.Rated),
+                                    string.Format("{0}",x.Content),
+                                    string.Format("{0}",x.ImageLink),
+                                    string.Format("{0}",x.TrailerLink)
+                                };
+
+                                writer.WriteRow(row);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+
 
                 MessageBox.Show("Export successfully");
             }

@@ -8,13 +8,11 @@ using HtmlAgilityPack;
 using Fizzler.Systems.HtmlAgilityPack;
 using CrawlData.Common;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
 using System.IO;
 using CrawlData.Utilities;
 using iTextSharp.text;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Support.UI;
 
 namespace CrawlData
 {

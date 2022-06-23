@@ -40,6 +40,7 @@ namespace CrawlData
             {
                 string website = string.Empty;
 
+                // Get name of website
                 if (CbbWebsite.SelectedItem.ToString().IndexOf("www") != -1)
                 {
                     website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
@@ -52,9 +53,9 @@ namespace CrawlData
                 string url = CbbWebsite.SelectedItem.ToString();
                 string extension = CbbFormatter.SelectedItem.ToString();
 
-
                 dynamic dataList = null;
 
+                MessageBox.Show("Start getting data...");
                 switch (website)
                 {
                     case Constants.BHDSTAR:
@@ -74,6 +75,7 @@ namespace CrawlData
                     return;
                 }
 
+                MessageBox.Show("Start exporting data...");
                 switch (extension)
                 {
                     case ExtensionOfFile.TXT:
@@ -93,13 +95,14 @@ namespace CrawlData
                         break;
                 }
 
+                Cursor = Cursors.Arrow;
             }
             else
             {
+                Cursor = Cursors.Arrow;
                 MessageBox.Show("Website and Formatter cannot be blank. Please enter!");
             }
 
-            Cursor = Cursors.Arrow;
         }
 
         #region Crawl data
@@ -156,46 +159,24 @@ namespace CrawlData
 
                 using (CsvFileWriter writer = new CsvFileWriter(pathToSave + "\\" + website + extension))
                 {
-                    CsvRow header = new CsvRow
-                    {
-                        string.Format("{0}","Name"),
-                        string.Format("{0}","Director"),
-                        string.Format("{0}","Actors"),
-                        string.Format("{0}","TypeOfMovie"),
-                        string.Format("{0}","PremiereDate"),
-                        string.Format("{0}","Duration"),
-                        string.Format("{0}","Language"),
-                        string.Format("{0}","Rated"),
-                        string.Format("{0}","Content"),
-                        string.Format("{0}","ImageLink"),
-                        string.Format("{0}","TrailerLink")
-                    };
-
-                    writer.WriteRow(header);
 
                     switch (typeof(T).Name)
                     {
                         case FieldType.MOVIE:
+                            writer.WriteRow(AddHeader(FieldType.MOVIE));
+
                             foreach (var item in list)
                             {
-                                var x = (Movie)Convert.ChangeType(item, typeof(Movie));
+                                writer.WriteRow(AddRow(FieldType.MOVIE, item));
+                            }
 
-                                CsvRow row = new CsvRow
-                                {
-                                    string.Format("{0}",x.Name),
-                                    string.Format("{0}",x.Director),
-                                    string.Format("{0}",x.Actors),
-                                    string.Format("{0}",x.TypeOfMovie),
-                                    string.Format("{0}",x.PremiereDate),
-                                    string.Format("{0}",x.Duration),
-                                    string.Format("{0}",x.Language),
-                                    string.Format("{0}",x.Rated),
-                                    string.Format("{0}",x.Content),
-                                    string.Format("{0}",x.ImageLink),
-                                    string.Format("{0}",x.TrailerLink)
-                                };
+                            break;
+                        case FieldType.NEWS:
+                            writer.WriteRow(AddHeader(FieldType.NEWS));
 
-                                writer.WriteRow(row);
+                            foreach (var item in list)
+                            {
+                                writer.WriteRow(AddRow(FieldType.NEWS, item));
                             }
                             break;
                         default:
@@ -210,6 +191,78 @@ namespace CrawlData
             {
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private CsvRow AddHeader(string fieldType)
+        {
+            CsvRow header = new CsvRow();
+
+            switch (fieldType)
+            {
+                case FieldType.MOVIE:
+                    header.Add(string.Format("{0}", "Name"));
+                    header.Add(string.Format("{0}", "Director"));
+                    header.Add(string.Format("{0}", "Actors"));
+                    header.Add(string.Format("{0}", "TypeOfMovie"));
+                    header.Add(string.Format("{0}", "PremiereDate"));
+                    header.Add(string.Format("{0}", "Duration"));
+                    header.Add(string.Format("{0}", "Language"));
+                    header.Add(string.Format("{0}", "Rated"));
+                    header.Add(string.Format("{0}", "Content"));
+                    header.Add(string.Format("{0}", "ImageLink"));
+                    header.Add(string.Format("{0}", "TrailerLink"));
+
+                    break;
+                case FieldType.NEWS:
+                    header.Add(string.Format("{0}", "Title"));
+                    header.Add(string.Format("{0}", "Content"));
+                    header.Add(string.Format("{0}", "ImageUrl"));
+                    header.Add(string.Format("{0}", "TypeOfNews"));
+                    header.Add(string.Format("{0}", "PostDate"));
+                    break;
+                default:
+                    break;
+            }
+
+            return header;
+        }
+
+        private CsvRow AddRow<T>(string fieldType, T item)
+        {
+            CsvRow row = new CsvRow();
+
+            switch (fieldType)
+            {
+                case FieldType.MOVIE:
+                    var movie = (Movie)Convert.ChangeType(item, typeof(Movie));
+
+                    row.Add(string.Format("{0}", movie.Name));
+                    row.Add(string.Format("{0}", movie.Director));
+                    row.Add(string.Format("{0}", movie.Actors));
+                    row.Add(string.Format("{0}", movie.TypeOfMovie));
+                    row.Add(string.Format("{0}", movie.PremiereDate));
+                    row.Add(string.Format("{0}", movie.Duration));
+                    row.Add(string.Format("{0}", movie.Language));
+                    row.Add(string.Format("{0}", movie.Rated));
+                    row.Add(string.Format("{0}", movie.Content));
+                    row.Add(string.Format("{0}", movie.ImageLink));
+                    row.Add(string.Format("{0}", movie.TrailerLink));
+
+                    break;
+                case FieldType.NEWS:
+                    var news = (News)Convert.ChangeType(item, typeof(News));
+
+                    row.Add(string.Format("{0}", news.Title));
+                    row.Add(string.Format("{0}", news.Content));
+                    row.Add(string.Format("{0}", news.ImageUrl));
+                    row.Add(string.Format("{0}", news.TypeOfNews));
+                    row.Add(string.Format("{0}", news.PostDate));
+                    break;
+                default:
+                    break;
+            }
+
+            return row;
         }
 
         private void ExportToPdfFile<T>(List<T> list, string website, string extension)

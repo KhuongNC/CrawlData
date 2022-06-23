@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace CrawlData.Model
@@ -44,24 +45,32 @@ namespace CrawlData.Model
                     case Constants.KENH14:
                         nodeList = document.DocumentNode.QuerySelectorAll("ul.knsw-list > div > li").ToList();
 
-                        foreach (var item in nodeList)
+                        if (nodeList != null)
                         {
-                            // Get link to move detail page
-                            var aNode = item.QuerySelector("div.knswli-left a");
-                            string newsLink = "https://kenh14.vn" + aNode.Attributes["href"].Value.Trim();
 
-                            // Get type of news and post date
-                            string typeOfNews = item.QuerySelector(".knswli-meta a").InnerText;
-                            string postDate = item.QuerySelector(".knswli-meta .knswli-time").Attributes["title"].Value;
-
-                            // Get data from detail page
-                            news = CrawlDataFromDetailPage(newsLink, website);
-                            news.TypeOfNews = typeOfNews;
-                            news.PostDate = postDate;
-
-                            if (news != null)
+                            foreach (var item in nodeList)
                             {
-                                newsList.Add(news);
+                                // Get link to move detail page
+                                var aNode = item.QuerySelector("div.knswli-left a");
+
+                                if (aNode != null)
+                                {
+                                    string newsLink = "https://kenh14.vn" + aNode.Attributes["href"].Value.Trim();
+
+                                    // Get type of news and post date
+                                    string typeOfNews = item.QuerySelector(".knswli-meta a").InnerText;
+                                    string postDate = item.QuerySelector(".knswli-meta .knswli-time").Attributes["title"].Value;
+
+                                    // Get data from detail page
+                                    news = CrawlDataFromDetailPage(newsLink, website);
+                                    news.TypeOfNews = typeOfNews;
+                                    news.PostDate = postDate;
+
+                                    if (news != null)
+                                    {
+                                        newsList.Add(news);
+                                    }
+                                }
                             }
                         }
 
@@ -101,7 +110,11 @@ namespace CrawlData.Model
                 case Constants.KENH14:
                     // Get information about News
                     nodeList = document.DocumentNode.QuerySelector("div.klw-new-content");
-                    news = GetDetailFromKenh14(nodeList);
+
+                    if (nodeList != null)
+                    {
+                        news = GetDetailFromKenh14(nodeList);
+                    }
                     break;
                 default:
                     break;
@@ -122,7 +135,7 @@ namespace CrawlData.Model
 
             foreach (var item in contentList)
             {
-                news.Content += item.InnerText.Trim();
+                news.Content += System.Net.WebUtility.HtmlDecode(item.InnerText);
             }
 
             // Get all images of article

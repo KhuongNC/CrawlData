@@ -14,21 +14,21 @@ namespace CrawlData
     public partial class Form1 : Form
     {
         readonly string rootPath = new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
-        string currentDate = DateTime.Now.ToString("yyyyMMdd");
+        readonly string currentDate = DateTime.Now.ToString("yyyyMMdd");
         public Form1()
         {
             InitializeComponent();
 
             // Add items for Website combobox
-            CbbWebsite.Items.Add("https://www.bhdstar.vn/");
-            CbbWebsite.Items.Add("https://www.cgv.vn/");
-            CbbWebsite.Items.Add("https://kenh14.vn/");
-            //CbbWebsite.Items.Add("https://www.24h.com.vn/");
+            CbbWebsite.Items.Add(WebsiteLink.BHDSTAR);
+            CbbWebsite.Items.Add(WebsiteLink.CGV);
+            CbbWebsite.Items.Add(WebsiteLink.KENH14);
+            //CbbWebsite.Items.Add(WebsiteLink._24H);
 
             // Add items for Formatter combobox
-            CbbFormatter.Items.Add(".txt");
-            CbbFormatter.Items.Add(".csv");
-            CbbFormatter.Items.Add(".pdf");
+            CbbFormatter.Items.Add("txt");
+            CbbFormatter.Items.Add("csv");
+            CbbFormatter.Items.Add("pdf");
             //CbbFormatter.Items.Add(".xlsx");
         }
 
@@ -38,7 +38,7 @@ namespace CrawlData
 
             if (CbbFormatter.SelectedItem != null && CbbWebsite.SelectedItem != null)
             {
-                string website = string.Empty;
+                string website;
 
                 // Get name of website
                 if (CbbWebsite.SelectedItem.ToString().IndexOf("www") != -1)
@@ -102,20 +102,17 @@ namespace CrawlData
                 Cursor = Cursors.Arrow;
                 MessageBox.Show("Website and Formatter cannot be blank. Please enter!");
             }
-
         }
 
         #region Crawl data
         private List<Movie> CrawlDataForMovie(string url, string website)
         {
-            CrawlDataForMovie data = new CrawlDataForMovie();
-            return data.CrawlData(url, website);
+            return CrawlData.Utilities.CrawlData.CrawlDataFromWebsite<Movie>(url, website);
         }
 
         private List<News> CrawlDataForNews(string url, string website)
         {
-            CrawlDataForNews data = new CrawlDataForNews();
-            return data.CrawlData(url, website);
+            return CrawlData.Utilities.CrawlData.CrawlDataFromWebsite<News>(url,website);
         }
 
         #endregion

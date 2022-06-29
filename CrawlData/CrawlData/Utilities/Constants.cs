@@ -6,6 +6,13 @@
         public const string CGV = "CGV";
         public const string KENH14 = "KENH14";
     }
+    public static class WebsiteLink
+    {
+        public const string BHDSTAR = "https://www.bhdstar.vn/";
+        public const string KENH14 = "https://kenh14.vn/";
+        public const string CGV = "https://www.cgv.vn/";
+        public const string _24H = "https://www.24h.com.vn/";
+    }
 
     public static class ExtensionOfFile
     {

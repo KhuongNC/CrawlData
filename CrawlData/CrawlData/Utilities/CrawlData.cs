@@ -161,7 +161,7 @@ namespace CrawlData.Utilities
                     break;
                 case Constants.KENH14:
                     // Get information about News
-                    nodeList = document.DocumentNode.QuerySelector("div.klw-new-content");
+                    nodeList = document.DocumentNode.QuerySelector("div.klw-body-top");
 
                     if (nodeList != null)
                     {
@@ -198,10 +198,10 @@ namespace CrawlData.Utilities
         {
             News news = new News()
             {
-                // Get type of news and post date
                 TypeOfNews = parentNodeFromMainPage.QuerySelector(".knswli-meta a").InnerText,
                 PostDate = parentNodeFromMainPage.QuerySelector(".knswli-meta .knswli-time").Attributes["title"].Value,
-                Title = nodeList != null ? nodeList.QuerySelector(".knc-sapo").InnerText.Trim() : ""
+                Title = nodeList != null ? nodeList.QuerySelector(".knc-sapo").InnerText.Trim() : "",
+                Author = nodeList.QuerySelector(".kbwc-header > .kbwc-meta > .kbwcm-author").InnerText.Trim().Replace(',', ' ')
             };
 
             // Get all nodes which store all contents of article

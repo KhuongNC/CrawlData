@@ -53,7 +53,7 @@ namespace CrawlData
                     }
 
                     string url = CbbWebsite.SelectedItem.ToString();
-                    string extension = CbbFormatter.SelectedItem.ToString();
+                    string extension = "." + CbbFormatter.SelectedItem.ToString();
 
                     dynamic dataList = null;
 
@@ -141,7 +141,7 @@ namespace CrawlData
                     Directory.CreateDirectory(pathToSave);
                 }
 
-                File.WriteAllText(pathToSave + "\\" + website + "." + extension, jsonFormatted);
+                File.WriteAllText(pathToSave + "\\" + website + extension, jsonFormatted);
 
                 MessageBox.Show("Export successfully", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

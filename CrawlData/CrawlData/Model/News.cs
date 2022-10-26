@@ -17,5 +17,6 @@ namespace CrawlData.Model
         public string ImageUrl { get; set; }
         public string TypeOfNews { get; set; }
         public string PostDate { get; set; }
+        public string Author { get; set; }
     }
 }

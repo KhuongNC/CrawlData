@@ -16,10 +16,10 @@
 
     public static class ExtensionOfFile
     {
-        public const string TXT = "txt";
-        public const string CSV = "csv";
-        public const string PDF = "pdf";
-        public const string XLSX = "xlsx";
+        public const string TXT = ".txt";
+        public const string CSV = ".csv";
+        public const string PDF = ".pdf";
+        public const string XLSX = ".xlsx";
     }
 
     public static class FieldType

@@ -27,4 +27,12 @@
         public const string MOVIE = "Movie";
         public const string NEWS = "News";
     }
+    public static class Separator
+    {
+        public const char ASTERIC = '*';
+        public const char COMMA = ',';
+        public const char COLON = ':';
+        public const char QUESTIONMARK = '?';
+        public const char HYPHEN = '-';
+    }
 }

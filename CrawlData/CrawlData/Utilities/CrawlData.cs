@@ -23,7 +23,7 @@ namespace CrawlData.Utilities
             };
 
             // Load web, store data into document
-            HtmlAgilityPack.HtmlDocument document = htmlWeb.Load(url);
+            HtmlDocument document = htmlWeb.Load(url);
 
             // Parent node
             List<HtmlNode> nodeList = new List<HtmlNode>();
@@ -49,7 +49,7 @@ namespace CrawlData.Utilities
                     }
                     break;
                 case Constants.CGV:
-                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                    HtmlDocument doc = new HtmlDocument();
 
                     // Because the error "please enable javascript to view the page content agility".
                     // So use ChromeDriver and Selenium to get html page of CGV website

@@ -3,11 +3,9 @@ using CrawlData.Model;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
 using OpenQA.Selenium.Chrome;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CrawlData.Utilities
 {
@@ -84,7 +82,6 @@ namespace CrawlData.Utilities
 
                     if (nodeList != null)
                     {
-
                         foreach (var item in nodeList)
                         {
                             // Get link to move detail page
@@ -213,7 +210,7 @@ namespace CrawlData.Utilities
             }
 
             // Get all images of article
-            var divNodeList = nodeList.QuerySelectorAll(".knc-content > div.VCSortableInPreviewMode").ToList();
+            var divNodeList = nodeList.QuerySelectorAll(".knc-content > .VCSortableInPreviewMode").ToList();
 
             foreach (var item in divNodeList)
             {

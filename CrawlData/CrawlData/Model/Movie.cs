@@ -1,14 +1,4 @@
-﻿using CrawlData.Common;
-using Fizzler.Systems.HtmlAgilityPack;
-using HtmlAgilityPack;
-using OpenQA.Selenium.Chrome;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-
-namespace CrawlData.Model
+﻿namespace CrawlData.Model
 {
     public class Movie
     {

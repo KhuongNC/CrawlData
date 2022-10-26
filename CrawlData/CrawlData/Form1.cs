@@ -219,11 +219,13 @@ namespace CrawlData
 
                     break;
                 case FieldType.NEWS:
+                    header.Add(string.Format("{0}", "Id"));
                     header.Add(string.Format("{0}", "Title"));
                     header.Add(string.Format("{0}", "Content"));
                     header.Add(string.Format("{0}", "ImageUrl"));
                     header.Add(string.Format("{0}", "TypeOfNews"));
                     header.Add(string.Format("{0}", "PostDate"));
+                    header.Add(string.Format("{0}", "Author"));
                     break;
                 default:
                     break;
@@ -257,11 +259,13 @@ namespace CrawlData
                 case FieldType.NEWS:
                     var news = (News)Convert.ChangeType(item, typeof(News));
 
+                    row.Add(string.Format("{0}", news.Id));
                     row.Add(string.Format("{0}", news.Title));
                     row.Add(string.Format("{0}", news.Content));
                     row.Add(string.Format("{0}", news.ImageUrl));
                     row.Add(string.Format("{0}", news.TypeOfNews));
                     row.Add(string.Format("{0}", news.PostDate));
+                    row.Add(string.Format("{0}", news.Author));
                     break;
                 default:
                     break;

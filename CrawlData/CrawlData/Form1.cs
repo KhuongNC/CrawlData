@@ -34,85 +34,93 @@ namespace CrawlData
 
         private void BtnExport_Click(object sender, EventArgs e)
         {
-            Cursor = Cursors.WaitCursor;
-
-            if (CbbFormatter.SelectedItem != null && CbbWebsite.SelectedItem != null)
+            try
             {
-                string website;
+                Cursor = Cursors.WaitCursor;
 
-                // Get name of website
-                if (CbbWebsite.SelectedItem.ToString().IndexOf("www") != -1)
+                if (CbbFormatter.SelectedItem != null && CbbWebsite.SelectedItem != null)
                 {
-                    website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
+                    string website;
+
+                    // Get name of website
+                    if (CbbWebsite.SelectedItem.ToString().IndexOf("www") != -1)
+                    {
+                        website = CbbWebsite.SelectedItem.ToString().Split('.')[1].ToUpper();
+                    }
+                    else
+                    {
+                        website = CbbWebsite.SelectedItem.ToString().Split('.')[0].Substring(8).ToUpper();
+                    }
+
+                    string url = CbbWebsite.SelectedItem.ToString();
+                    string extension = CbbFormatter.SelectedItem.ToString();
+
+                    dynamic dataList = null;
+
+                    MessageBox.Show("Start getting data...");
+                    switch (website)
+                    {
+                        case Constants.BHDSTAR:
+                        case Constants.CGV:
+                            dataList = CrawlDataForMovie(url, website);
+                            break;
+                        case Constants.KENH14:
+                            dataList = CrawlDataForNews(url, website);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (dataList == null || dataList.Count == 0)
+                    {
+                        MessageBox.Show("There are something wrong when crawl data from " + website + " website", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        return;
+                    }
+
+                    MessageBox.Show("Start exporting data...");
+                    switch (extension)
+                    {
+                        case ExtensionOfFile.TXT:
+                            ExportToTextFile(dataList, website, extension);
+                            break;
+                        case ExtensionOfFile.CSV:
+                            ExportToCsvFile(dataList, website, extension);
+                            break;
+                        case ExtensionOfFile.PDF:
+                            ExportToPdfFile(dataList, website, extension);
+                            break;
+                        case ExtensionOfFile.XLSX:
+                            //ExportToTextFile(dataList, website, extension);
+                            break;
+                        default:
+                            MessageBox.Show("Please select extension of file");
+                            break;
+                    }
+
+                    Cursor = Cursors.Arrow;
                 }
                 else
                 {
-                    website = CbbWebsite.SelectedItem.ToString().Split('.')[0].Substring(8).ToUpper();
+                    Cursor = Cursors.Arrow;
+                    MessageBox.Show("Website and Formatter cannot be blank. Please enter!");
                 }
-
-                string url = CbbWebsite.SelectedItem.ToString();
-                string extension = CbbFormatter.SelectedItem.ToString();
-
-                dynamic dataList = null;
-
-                MessageBox.Show("Start getting data...");
-                switch (website)
-                {
-                    case Constants.BHDSTAR:
-                    case Constants.CGV:
-                        dataList = CrawlDataForMovie(url, website);
-                        break;
-                    case Constants.KENH14:
-                        dataList = CrawlDataForNews(url, website);
-                        break;
-                    default:
-                        break;
-                }
-
-                if (dataList == null || dataList.Count == 0)
-                {
-                    MessageBox.Show("There are something wrong when crawl data from " + website + " website", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    return;
-                }
-
-                MessageBox.Show("Start exporting data...");
-                switch (extension)
-                {
-                    case ExtensionOfFile.TXT:
-                        ExportToTextFile(dataList, website, extension);
-                        break;
-                    case ExtensionOfFile.CSV:
-                        ExportToCsvFile(dataList, website, extension);
-                        break;
-                    case ExtensionOfFile.PDF:
-                        ExportToPdfFile(dataList, website, extension);
-                        break;
-                    case ExtensionOfFile.XLSX:
-                        //ExportToTextFile(dataList, website, extension);
-                        break;
-                    default:
-                        MessageBox.Show("Please select extension of file");
-                        break;
-                }
-
-                Cursor = Cursors.Arrow;
             }
-            else
+            catch (Exception ex)
             {
                 Cursor = Cursors.Arrow;
-                MessageBox.Show("Website and Formatter cannot be blank. Please enter!");
+                MessageBox.Show(ex.Message.ToString());
             }
         }
 
         #region Crawl data
         private List<Movie> CrawlDataForMovie(string url, string website)
         {
-            return CrawlData.Utilities.CrawlData.CrawlDataFromWebsite<Movie>(url, website);
+            return Utilities.CrawlData.CrawlDataFromWebsite<Movie>(url, website);
         }
 
         private List<News> CrawlDataForNews(string url, string website)
         {
-            return CrawlData.Utilities.CrawlData.CrawlDataFromWebsite<News>(url,website);
+            return Utilities.CrawlData.CrawlDataFromWebsite<News>(url, website);
         }
 
         #endregion
@@ -133,7 +141,7 @@ namespace CrawlData
                     Directory.CreateDirectory(pathToSave);
                 }
 
-                File.WriteAllText(pathToSave + "\\" + website + extension, jsonFormatted);
+                File.WriteAllText(pathToSave + "\\" + website + "." + extension, jsonFormatted);
 
                 MessageBox.Show("Export successfully", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
